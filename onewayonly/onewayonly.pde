@@ -92,13 +92,13 @@ void dibujarBotonesMenu() {
   fill(50, 50, 50, 200);
   rect(btnX, btnY_Sonido, btnAncho, btnAlto, 10);
   fill(130); textSize(20);
-  text("Opciones de Sonido (Próximamente)", width / 2, btnY_Sonido + 25);
+  text("Opciones de Sonido (Proximamente)", width / 2, btnY_Sonido + 25);
 
   int btnY_Teclas = 440;
   fill(50, 50, 50, 200);
   rect(btnX, btnY_Teclas, btnAncho, btnAlto, 10);
   fill(130); textSize(20);
-  text("Configurar Teclas (Próximamente)", width / 2, btnY_Teclas + 25);
+  text("Configurar Teclas (Proximamente)", width / 2, btnY_Teclas + 25);
 }
 
 void actualizarYDibujarJuego() {
