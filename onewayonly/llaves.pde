@@ -28,3 +28,14 @@ void keyReleased() {
     equipamiento.soltarCubrir();
   }
 }
+void mousePressed() {
+  if (estadoJuego == 0) {
+    int btnX = width / 2 - 180;
+    int btnY_Jugar = 280;
+    
+    if (mouseX > btnX && mouseX < btnX + 360 && mouseY > btnY_Jugar && mouseY < btnY_Jugar + 55) {
+      iniciarJuego();
+      estadoJuego = 1;
+    }
+  }
+}

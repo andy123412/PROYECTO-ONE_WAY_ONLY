@@ -76,15 +76,17 @@ class Jugador {
           if (b.tipo == 8 && !b.usado) {
           b.usado = true;
           float suerte = random(100);
+          
           if (suerte < 33) {
             vida = 100; 
-            b.recompensaDada = 1; // Le avisamos al bloque que dibuje VIDA
+            b.recompensaDada = 1; 
           } else if (suerte < 66) {
-            equipamiento.durabilidad = 100; 
-            b.recompensaDada = 2; // Le avisamos al bloque que dibuje REPARACION
+            equipamiento.durabilidadEspada = 100; 
+            equipamiento.durabilidadEscudo = 100;
+            b.recompensaDada = 2; 
           } else {
             equipamiento.poderFuegoActivado = true; 
-            b.recompensaDada = 3; // Le avisamos al bloque que dibuje FUEGO
+            b.recompensaDada = 3; 
           }
         }
         }

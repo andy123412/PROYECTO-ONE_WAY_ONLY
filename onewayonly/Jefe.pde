@@ -72,9 +72,15 @@ class Jefe {
 
   void mostrar() {
     if (activo == 1) {
-      fill(204, 0, 0); 
-      noStroke();
+      fill(204, 0, 0); noStroke();
       rect(x, y, ancho, alto);
+      
+      fill(100, 0, 0); 
+      rect(x, y - 15, ancho, 8);
+      
+      fill(0, 255, 0);
+      float anchoVida = map(vida, 0, 200, 0, ancho);
+      rect(x, y - 15, max(0, anchoVida), 8);
     }
   }
 }

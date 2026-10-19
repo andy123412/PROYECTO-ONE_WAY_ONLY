@@ -41,18 +41,64 @@ void draw() {
 }
 
 void dibujarMenu() {
-  background(30, 30, 45);
+  background(135, 206, 235);
+  
+  noStroke();
+  fill(255, 220, 50);
+  ellipse(width / 2, 200, 150, 150);
+  
+  fill(100, 120, 150);
+  triangle(100, 600, 450, 150, 800, 600);
+  triangle(600, 600, 950, 250, 1300, 600);
+  triangle(-100, 600, 200, 300, 500, 600);
+  
+  fill(34, 139, 34);
+  ellipse(300, 650, 900, 400);
+  ellipse(1000, 600, 800, 300);
+
+  filter(BLUR, 6); 
+
+  fill(0, 0, 0, 120);
+  rect(0, 0, width, height);
+
   textAlign(CENTER, CENTER);
-  fill(255, 215, 0);
-  textSize(36);
-  text("ONE WAY ONLY", width / 2, 180);
+  fill(255, 215, 0); 
+  textSize(70);
+  text("ONE WAY ONLY", width / 2, 140);
+  
   fill(255);
-  textSize(18);
-  text("Presiona ENTER para Comenzar", width / 2, 300);
-  fill(180);
-  textSize(14);
-  text("A/D: Moverse | W/Espacio: Saltar | J: Espada | K: Escudo", width / 2, 420);
-  textAlign(LEFT, BASELINE);
+  textSize(16);
+  text("V 1.0", width / 2 + 250, 170);
+
+  dibujarBotonesMenu();
+}
+
+void dibujarBotonesMenu() {
+  int btnX = width / 2 - 180;
+  int btnAncho = 360;
+  int btnAlto = 55;
+
+  int btnY_Jugar = 280;
+  if (mouseX > btnX && mouseX < btnX + btnAncho && mouseY > btnY_Jugar && mouseY < btnY_Jugar + btnAlto) {
+    fill(200, 50, 50);
+  } else {
+    fill(150, 30, 30);
+  }
+  rect(btnX, btnY_Jugar, btnAncho, btnAlto, 10);
+  fill(255); textSize(24);
+  text("JUGAR", width / 2, btnY_Jugar + 25);
+
+  int btnY_Sonido = 360;
+  fill(50, 50, 50, 200);
+  rect(btnX, btnY_Sonido, btnAncho, btnAlto, 10);
+  fill(130); textSize(20);
+  text("Opciones de Sonido (Próximamente)", width / 2, btnY_Sonido + 25);
+
+  int btnY_Teclas = 440;
+  fill(50, 50, 50, 200);
+  rect(btnX, btnY_Teclas, btnAncho, btnAlto, 10);
+  fill(130); textSize(20);
+  text("Configurar Teclas (Próximamente)", width / 2, btnY_Teclas + 25);
 }
 
 void actualizarYDibujarJuego() {
@@ -82,7 +128,7 @@ void actualizarYDibujarJuego() {
 
   for (int i = enemigos.size() - 1; i >= 0; i--) {
     TortugaPerseguidora e = enemigos.get(i);
-    e.actualizar(jugador.pos.x, jugador, equipamiento, cargador.plataformas);
+    e.actualizar(jugador.pos.x, jugador, equipamiento, cargador.plataformas, enemigos);      
     if (e.activo == 0) enemigos.remove(i);
   }
 
@@ -103,7 +149,9 @@ void actualizarYDibujarJuego() {
   jefeFinal.actualizar(jugador, cargador.plataformas);
   jefeFinal.atacarSiEstaCerca(jugador, equipamiento);
   jefeFinal.mostrar();
-  if (jefeFinal.vida <= 0 && jefeFinal.activo == 1) estadoJuego = 3;
+  if (jefeFinal.vida <= 0) {
+    estadoJuego = 3; 
+  }
   
   jugador.mostrar();
   equipamiento.mostrar(jugador);
@@ -129,21 +177,42 @@ void actualizarYDibujarJuego() {
 }
 
 void dibujarHUD() {
-  fill(0, 0, 0, 150);
+  fill(0, 0, 0, 200); 
   noStroke();
-  rect(20, 20, 230, 120);
+  rect(0, 0, width, 40);
+
+  textSize(13);
+  textAlign(CENTER, CENTER);
 
   fill(255);
-  textSize(13);
-  text("Vida: " + (int)jugador.vida + " HP", 20, 30);
-  text("Zona: " + nivelActual, 140, 30);
+  text("VIDA: " + (int)jugador.vida + " HP", 60, 20);
+
+  if (equipamiento.durabilidadEspada > 0) fill(255); else fill(255, 50, 50);
+  text("ESPADA: " + (int)equipamiento.durabilidadEspada + "%", 170, 20);
+
+  if (equipamiento.durabilidadEscudo > 0) fill(255); else fill(255, 50, 50);
+  text("ESCUDO: " + (int)equipamiento.durabilidadEscudo + "%", 290, 20);
+
+  String estadoFuego = "Bloqueado";
+  fill(150);
+  if (equipamiento.poderFuegoActivado) {
+    int tiempoRestante = 5000 - (millis() - ultimoDisparoFuego);
+    if (tiempoRestante <= 0) {
+      estadoFuego = "LISTO (L)";
+      fill(255, 255, 0);
+    } else {
+      estadoFuego = "Carga: " + (tiempoRestante / 1000) + "s";
+    }
+  }
+  text("FUEGO: " + estadoFuego, 420, 20);
   
-  text("CONTROLES:", 20, 55);
   fill(255);
-  text(" A / D : Mover Izq / Der", 20, 72);
-  text(" W / ESPACIO : Saltar", 20, 87);
-  text(" J : Atacar con Espada", 20, 102);
-  text(" K : Defender con Escudo", 20, 117);
+  text("ZONA: " + nivelActual, 530, 20);
+
+  fill(200);
+  text("A/D: Mover | W: Saltar | J: Atacar | K: Bloquear", 860, 20);
+
+  textAlign(LEFT, BASELINE);
 }
 
 void dibujarGameOver() {

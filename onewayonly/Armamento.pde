@@ -4,13 +4,17 @@ class Armamento {
   float rangoAtaque = 50;
   float durabilidad = 100;
   boolean poderFuegoActivado = false; 
-
   boolean bloqueando = false;
-
+  
+  float durabilidadEspada = 100;
+  float durabilidadEscudo = 100;
+  
   Armamento() {}
 
-  void cubrir() {
-    bloqueando = true;
+ void cubrir() {
+    if (durabilidadEscudo > 0) {
+      bloqueando = true;
+    }
   }
 
   void soltarCubrir() {
@@ -18,32 +22,50 @@ class Armamento {
   }
 
   void atacar(ArrayList<TortugaPerseguidora> listaEnemigos, Jugador jugador) {
-    if (atacando == 0 && !bloqueando) {
+    if (atacando == 0 && !bloqueando && durabilidadEspada > 0) {
       atacando = 1;
       tiempoAtaque = millis();
+      
+      boolean golpeExitoso = false;
 
       for (int i = 0; i < listaEnemigos.size(); i++) {
         TortugaPerseguidora e = listaEnemigos.get(i);
         float dist = dist(jugador.pos.x, jugador.pos.y, e.pos.x, e.pos.y);
         if (dist <= rangoAtaque + e.ancho) {
           e.recibirDano(20);
+          golpeExitoso = true;
         }
+      }
+      if (golpeExitoso) {
+        durabilidadEspada -= 5;
+        if (durabilidadEspada < 0) durabilidadEspada = 0;
       }
     }
   }
-
+  
+float mitigarDano(float cantidadBase) {
+    if (bloqueando && durabilidadEscudo > 0) {
+      durabilidadEscudo -= 5;
+      
+      if (durabilidadEscudo <= 0) {
+        durabilidadEscudo = 0;
+        bloqueando = false;
+      }
+      
+      return cantidadBase * 0.2;
+    }
+    return cantidadBase;
+  }
+  
   void actualizar(float px, float py, boolean mirandoIzq) {
     if (atacando == 1 && millis() - tiempoAtaque > 250) {
       atacando = 0;
     }
+    if (atacando == 1 && millis() - tiempoAtaque > 300) {
+      atacando = 0;
+    }
   }
 
-  float mitigarDano(float danoBase) {
-    if (bloqueando) {
-      return 2;
-    }
-    return danoBase;
-  }
 
   void mostrar(Jugador jugador) {
     pushMatrix();
