@@ -6,14 +6,14 @@ class BolaFuego {
 
   BolaFuego(float x, float y, boolean mirandoIzq) {
     pos = new PVector(x, y);
-    vel = new PVector(mirandoIzq ? -6 : 6, -3); 
+    vel = new PVector(mirandoIzq ? -6 : 6, -3);
     tiempoCreacion = millis();
   }
 
   void actualizar(ArrayList<Bloque> plataformas, ArrayList<TortugaPerseguidora> enemigos, Jefe jefe) {
     if (!activa) return;
 
-    if (millis() - tiempoCreacion > 5000) {
+    if (millis() - tiempoCreacion > 2500) {
       activa = false;
       return;
     }

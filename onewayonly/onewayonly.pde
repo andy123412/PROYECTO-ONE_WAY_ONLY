@@ -1,4 +1,4 @@
-int estadoJuego = 0; 
+int estadoJuego = 0;
 Jefe jefeFinal;
 Jugador jugador;
 CargadorCSV cargador;
@@ -11,6 +11,8 @@ int nivelActual = 1;
 int teclaA = 0;
 int teclaD = 0;
 int teclaSalto = 0;
+int puntaje = 0;
+ArrayList<PlantaCarnivora> plantas;
 
 void setup() {
   size(1200, 600);
@@ -20,6 +22,7 @@ void setup() {
 void iniciarJuego() {
   jefeFinal = new Jefe(0, 0);
   bolasFuego = new ArrayList<BolaFuego>();
+  plantas = new ArrayList<PlantaCarnivora>();
   efectosParticulas = new ArrayList<SistemaParticulas>();
   jugador = new Jugador(100, 100);
   cargador = new CargadorCSV();
@@ -36,36 +39,36 @@ void draw() {
   } else if (estadoJuego == 2) {
     dibujarGameOver();
   } else if (estadoJuego == 3) {
-  dibujarVictoria();
- }
+    dibujarVictoria();
+  }
 }
 
 void dibujarMenu() {
   background(135, 206, 235);
-  
+
   noStroke();
   fill(255, 220, 50);
   ellipse(width / 2, 200, 150, 150);
-  
+
   fill(100, 120, 150);
   triangle(100, 600, 450, 150, 800, 600);
   triangle(600, 600, 950, 250, 1300, 600);
   triangle(-100, 600, 200, 300, 500, 600);
-  
+
   fill(34, 139, 34);
   ellipse(300, 650, 900, 400);
   ellipse(1000, 600, 800, 300);
 
-  filter(BLUR, 6); 
+  filter(BLUR, 6);
 
   fill(0, 0, 0, 120);
   rect(0, 0, width, height);
 
   textAlign(CENTER, CENTER);
-  fill(255, 215, 0); 
+  fill(255, 215, 0);
   textSize(70);
   text("ONE WAY ONLY", width / 2, 140);
-  
+
   fill(255);
   textSize(16);
   text("V 1.0", width / 2 + 250, 170);
@@ -85,19 +88,22 @@ void dibujarBotonesMenu() {
     fill(150, 30, 30);
   }
   rect(btnX, btnY_Jugar, btnAncho, btnAlto, 10);
-  fill(255); textSize(24);
+  fill(255);
+  textSize(24);
   text("JUGAR", width / 2, btnY_Jugar + 25);
 
   int btnY_Sonido = 360;
   fill(50, 50, 50, 200);
   rect(btnX, btnY_Sonido, btnAncho, btnAlto, 10);
-  fill(130); textSize(20);
+  fill(130);
+  textSize(20);
   text("Opciones de Sonido (Proximamente)", width / 2, btnY_Sonido + 25);
 
   int btnY_Teclas = 440;
   fill(50, 50, 50, 200);
   rect(btnX, btnY_Teclas, btnAncho, btnAlto, 10);
-  fill(130); textSize(20);
+  fill(130);
+  textSize(20);
   text("Configurar Teclas (Proximamente)", width / 2, btnY_Teclas + 25);
 }
 
@@ -105,16 +111,16 @@ void actualizarYDibujarJuego() {
   float tramo = cargador.anchoTotalMapa / 4.0;
 
   if (jugador.pos.x < tramo) {
-    nivelActual = 1; 
+    nivelActual = 1;
     background(170, 215, 255);
   } else if (jugador.pos.x >= tramo && jugador.pos.x < tramo * 2) {
-    nivelActual = 2; 
+    nivelActual = 2;
     background(100, 160, 110);
   } else if (jugador.pos.x >= tramo * 2 && jugador.pos.x < tramo * 3) {
-    nivelActual = 3; 
+    nivelActual = 3;
     background(140, 160, 180);
   } else {
-    nivelActual = 4; 
+    nivelActual = 4;
     background(40, 30, 50);
   }
 
@@ -128,7 +134,7 @@ void actualizarYDibujarJuego() {
 
   for (int i = enemigos.size() - 1; i >= 0; i--) {
     TortugaPerseguidora e = enemigos.get(i);
-    e.actualizar(jugador.pos.x, jugador, equipamiento, cargador.plataformas, enemigos);      
+    e.actualizar(jugador, equipamiento, cargador.plataformas, enemigos);      
     if (e.activo == 0) enemigos.remove(i);
   }
 
@@ -138,24 +144,36 @@ void actualizarYDibujarJuego() {
 
   float camaraX = width / 3 - jugador.pos.x;
 
-  pushMatrix();
-  translate(camaraX, 0);
 
+  pushMatrix();
+  for (int i = plantas.size() - 1; i >= 0; i--) {
+    PlantaCarnivora p = plantas.get(i);
+    p.actualizar(jugador);
+    p.mostrar();
+    if (p.activo == 0) plantas.remove(i);
+  }
+  translate(camaraX, 0);
+  for (int i = plantas.size() - 1; i >= 0; i--) {
+    PlantaCarnivora p = plantas.get(i);
+    p.actualizar(jugador);
+    p.mostrar();
+    if (p.activo == 0) plantas.remove(i);
+  }
   cargador.mostrar(nivelActual);
 
   for (int i = 0; i < enemigos.size(); i++) {
     enemigos.get(i).mostrar();
-  }  
+  }
   jefeFinal.actualizar(jugador, cargador.plataformas);
   jefeFinal.atacarSiEstaCerca(jugador, equipamiento);
   jefeFinal.mostrar();
   if (jefeFinal.vida <= 0) {
-    estadoJuego = 3; 
+    estadoJuego = 3;
   }
-  
+
   jugador.mostrar();
   equipamiento.mostrar(jugador);
-  
+
   for (int i = bolasFuego.size() - 1; i >= 0; i--) {
     BolaFuego bf = bolasFuego.get(i);
     bf.actualizar(cargador.plataformas, enemigos, jefeFinal);
@@ -210,7 +228,10 @@ void dibujarHUD() {
   text("ZONA: " + nivelActual, 530, 20);
 
   fill(200);
-  text("A/D: Mover | W: Saltar | J: Atacar | K: Bloquear", 860, 20);
+  text("A/D: Mover | W: Saltar | J: Atacar | K: Bloquear", 780, 20);
+
+  fill(255, 215, 0);
+  text("PUNTAJE: " + puntaje, 1100, 20);
 
   textAlign(LEFT, BASELINE);
 }
@@ -229,8 +250,10 @@ void dibujarGameOver() {
 void dibujarVictoria() {
   background(50, 150, 50);
   textAlign(CENTER, CENTER);
-  fill(255, 215, 0); textSize(40);
+  fill(255, 215, 0);
+  textSize(40);
   text("¡VICTORIA!", width / 2, 250);
-  fill(255); textSize(18);
+  fill(255);
+  textSize(18);
   text("Derrotaste al jefe. Presiona ENTER para jugar de nuevo.", width/2, 340);
 }

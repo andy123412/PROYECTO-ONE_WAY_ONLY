@@ -10,7 +10,7 @@ class CargadorCSV {
   void cargarDesdeCSV(String rutaCSV, Jugador jug, ArrayList<TortugaPerseguidora> listaEnemigos, Jefe jefeGlobal) {
     plataformas.clear();
     listaEnemigos.clear();
-
+    plantas.clear();
     Table tabla = loadTable(rutaCSV);
 
     if (tabla == null) {
@@ -32,19 +32,22 @@ class CargadorCSV {
         float posX = col * tamanoTile;
         float posY = fila * tamanoTile;
 
-        if (valor >= 1 && valor <= 5 || valor == 8) {
-        plataformas.add(new Bloque(posX, posY, valor));
-      } else if (valor == 6) {
-        listaEnemigos.add(new TortugaPerseguidora(posX, posY));
-      } else if (valor == 7) {
-        jefeGlobal.x = posX;
-        jefeGlobal.y = posY;
-        jefeGlobal.activo = 1;
-        jefeGlobal.vida = 200;
-      } else if (valor == 9) {
-        jug.pos.x = posX;
-        jug.pos.y = posY;
-      }
+        if ((valor >= 1 && valor <= 5) || valor == 8 || valor == 10) {
+          plataformas.add(new Bloque(posX, posY, valor));
+          if (valor == 10) {
+            plantas.add(new PlantaCarnivora(posX + 5, posY));
+          }
+        } else if (valor == 6) {
+          listaEnemigos.add(new TortugaPerseguidora(posX, posY));
+        } else if (valor == 7) {
+          jefeGlobal.x = posX;
+          jefeGlobal.y = posY;
+          jefeGlobal.activo = 1;
+          jefeGlobal.vida = 200;
+        } else if (valor == 9) {
+          jug.pos.x = posX;
+          jug.pos.y = posY;
+        }
       }
     }
   }

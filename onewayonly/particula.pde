@@ -51,5 +51,5 @@ class SistemaParticulas {
       }
     }
     return true;
-}
+  }
 }
