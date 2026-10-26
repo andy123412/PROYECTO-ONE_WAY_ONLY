@@ -48,14 +48,14 @@ class TortugaPerseguidora extends Enemigo {
     float distanciaY = abs(jug.pos.y - pos.y);
 
     if (distanciaX < 350 && distanciaY < 150) {
-      if (jug.pos.x < pos.x - 5) vel.x = -velocidad;
+      if (jug.pos.x < pos.x - 5) vel.x = -velocidad; 
       else if (jug.pos.x > pos.x + 5) vel.x = velocidad;
-      else vel.x = 0;
+      else vel.x = 0; 
     } else {
       vel.x = velocidad * direccionPatrulla;
       if (abs(pos.x - xInicial) > 100) {
         direccionPatrulla *= -1;
-        pos.x += direccionPatrulla * 2;
+        pos.x += direccionPatrulla * 2; 
       }
     }
 
@@ -73,9 +73,9 @@ class TortugaPerseguidora extends Enemigo {
 
     if (!hayPisoAdelante && vel.y == 0) {
       if (distanciaX < 350 && distanciaY < 150) {
-        vel.x = 0;
+        vel.x = 0; 
       } else {
-        direccionPatrulla *= -1;
+        direccionPatrulla *= -1; 
         vel.x = velocidad * direccionPatrulla;
       }
     }
@@ -84,15 +84,9 @@ class TortugaPerseguidora extends Enemigo {
       TortugaPerseguidora otro = listaEnemigos.get(i);
       if (otro != this && otro.activo == 1) {
         if (pos.x < otro.pos.x + otro.ancho && pos.x + ancho > otro.pos.x &&
-          pos.y < otro.pos.y + otro.alto && pos.y + alto > otro.pos.y) {
-          if (pos.x < otro.pos.x) {
-            pos.x -= 1;
-            otro.pos.x += 1;
-          } else {
-            pos.x += 1;
-            otro.pos.x -= 1;
-          }
-          direccionPatrulla *= -1;
+            pos.y < otro.pos.y + otro.alto && pos.y + alto > otro.pos.y) {
+          if (pos.x < otro.pos.x) vel.x -= 0.5;
+          else vel.x += 0.5; 
         }
       }
     }
@@ -100,13 +94,19 @@ class TortugaPerseguidora extends Enemigo {
     pos.x += vel.x;
     for (int i = 0; i < plataformas.size(); i++) {
       Bloque b = plataformas.get(i);
-      if (pos.x < b.x + b.tamano && pos.x + ancho > b.x && pos.y < b.y + b.tamano && pos.y + (alto - 2) > b.y) {
-        if (vel.x > 0) {
-          pos.x = b.x - ancho;
-          direccionPatrulla = -1;
-        } else if (vel.x < 0) {
-          pos.x = b.x + b.tamano;
-          direccionPatrulla = 1;
+      if (pos.x < b.x + b.tamano && pos.x + ancho > b.x && pos.y < b.y + b.tamano && pos.y + alto > b.y) {
+        
+        if (pos.y + alto > b.y + 4) { 
+          float centroTortuga = pos.x + ancho / 2;
+          float centroBloque = b.x + b.tamano / 2;
+          
+          if (centroTortuga < centroBloque) {
+            pos.x = b.x - ancho;
+            direccionPatrulla = -1;
+          } else {
+            pos.x = b.x + b.tamano;
+            direccionPatrulla = 1;
+          }
         }
       }
     }
@@ -116,13 +116,11 @@ class TortugaPerseguidora extends Enemigo {
     for (int i = 0; i < plataformas.size(); i++) {
       Bloque b = plataformas.get(i);
       if (pos.x < b.x + b.tamano && pos.x + ancho > b.x && pos.y < b.y + b.tamano && pos.y + alto > b.y) {
-        if (vel.y > 0) {
-          pos.y = b.y - alto;
-          vel.y = 0;
-        }
+        if (vel.y > 0) { pos.y = b.y - alto; vel.y = 0; }
       }
     }
 
+    // 6. Daño al Jugador
     boolean colisionando = (jug.pos.x < pos.x + ancho && jug.pos.x + jug.ancho > pos.x && jug.pos.y < pos.y + alto && jug.pos.y + jug.alto > pos.y);
     if (colisionando) {
       if (jug.invencible) {
@@ -132,11 +130,11 @@ class TortugaPerseguidora extends Enemigo {
         if (tiempoActual - tiempoUltimoGolpe >= tiempoEsperaGolpe) {
           float danoReal = equip.mitigarDano(5);
           if (danoReal > 0) jug.vida -= danoReal;
-
+          
           if (equip.bloqueando) {
             efectosParticulas.add(new SistemaParticulas(15, jug.pos.x + (jug.mirandoIzquierda ? -10 : 20), jug.pos.y + 20, color(255, 220, 50)));
           }
-
+          
           tiempoUltimoGolpe = tiempoActual;
         }
       }
@@ -147,8 +145,7 @@ class TortugaPerseguidora extends Enemigo {
     if (activo == 1) {
       vida -= cantidad;
       if (vida <= 0) {
-        vida = 0;
-        activo = 0;
+        vida = 0; activo = 0;
         puntaje += 20;
       }
     }
@@ -156,12 +153,8 @@ class TortugaPerseguidora extends Enemigo {
 
   void mostrar() {
     if (activo == 1) {
-      fill(34, 139, 34);
-      stroke(0);
-      rect(pos.x, pos.y, ancho, alto);
-      fill(255, 0, 0);
-      noStroke();
-      rect(pos.x, pos.y - 10, ancho, 5);
+      fill(34, 139, 34); stroke(0); rect(pos.x, pos.y, ancho, alto);
+      fill(255, 0, 0); noStroke(); rect(pos.x, pos.y - 10, ancho, 5);
       fill(0, 255, 0);
       float anchoVida = map(vida, 0, 40, 0, ancho);
       rect(pos.x, pos.y - 10, max(0, anchoVida), 5);

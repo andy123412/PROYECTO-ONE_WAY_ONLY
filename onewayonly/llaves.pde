@@ -16,9 +16,18 @@ void keyPressed() {
     }
   }
 
-  if (keyCode == ENTER && (estadoJuego == 0 || estadoJuego == 2 || estadoJuego == 3)) {
-    iniciarJuego();
-    estadoJuego = 1;
+    if (estadoJuego == 1) {
+    if (keyCode == LEFT) slotSeleccionado = 0;
+    if (keyCode == RIGHT) slotSeleccionado = 1;
+  }
+
+  if (keyCode == ENTER) {
+    if (estadoJuego == 0 || estadoJuego == 2 || estadoJuego == 3) {
+      iniciarJuego();
+      estadoJuego = 1;
+    } else if (estadoJuego == 1) {
+      usarItem(slotSeleccionado);
+    }
   }
 }
 

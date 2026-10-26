@@ -6,6 +6,9 @@ Armamento equipamiento;
 ArrayList<TortugaPerseguidora> enemigos;
 ArrayList<SistemaParticulas> efectosParticulas;
 ArrayList<BolaFuego> bolasFuego;
+int[] inventario = {0, 0};
+int slotSeleccionado = 0;
+ArrayList<String> rankingTop10 = new ArrayList<String>();
 
 int nivelActual = 1;
 int teclaA = 0;
@@ -13,6 +16,9 @@ int teclaD = 0;
 int teclaSalto = 0;
 int puntaje = 0;
 ArrayList<PlantaCarnivora> plantas;
+
+ConexionBD baseDatos;
+boolean partidaGuardada = false;
 
 void setup() {
   size(1200, 600);
@@ -29,6 +35,9 @@ void iniciarJuego() {
   equipamiento = new Armamento();
   enemigos = new ArrayList<TortugaPerseguidora>();
   cargador.cargarDesdeCSV("mapa1.csv", jugador, enemigos, jefeFinal);
+  baseDatos = new ConexionBD();
+  baseDatos.conectar();
+  partidaGuardada = false;
 }
 
 void draw() {
@@ -146,12 +155,6 @@ void actualizarYDibujarJuego() {
 
 
   pushMatrix();
-  for (int i = plantas.size() - 1; i >= 0; i--) {
-    PlantaCarnivora p = plantas.get(i);
-    p.actualizar(jugador);
-    p.mostrar();
-    if (p.activo == 0) plantas.remove(i);
-  }
   translate(camaraX, 0);
   for (int i = plantas.size() - 1; i >= 0; i--) {
     PlantaCarnivora p = plantas.get(i);
@@ -188,28 +191,43 @@ void actualizarYDibujarJuego() {
       efectosParticulas.remove(i);
     }
   }
+  if (jugador.vida <= 0) {
+    estadoJuego = 2;
+    if (!partidaGuardada) {
+      baseDatos.guardarPartida(nivelActual, puntaje, 0, equipamiento.durabilidadEspada, equipamiento.durabilidadEscudo, false);
+      partidaGuardada = true;
+    }
+  }
 
+  if (jefeFinal.vida <= 0) {
+    estadoJuego = 3;
+    if (!partidaGuardada) {
+      baseDatos.guardarPartida(4, puntaje, jugador.vida, equipamiento.durabilidadEspada, equipamiento.durabilidadEscudo, true);
+      partidaGuardada = true;
+    }
+  }
   popMatrix();
 
   dibujarHUD();
 }
 
 void dibujarHUD() {
-  fill(0, 0, 0, 200); 
+  fill(0, 0, 0, 200);
   noStroke();
   rect(0, 0, width, 40);
 
   textSize(13);
-  textAlign(CENTER, CENTER);
 
+  textAlign(LEFT, CENTER);
+  
   fill(255);
-  text("VIDA: " + (int)jugador.vida + " HP", 60, 20);
+  text("VIDA: " + (int)jugador.vida + " HP", 20, 20);
 
   if (equipamiento.durabilidadEspada > 0) fill(255); else fill(255, 50, 50);
-  text("ESPADA: " + (int)equipamiento.durabilidadEspada + "%", 170, 20);
+  text("ESPADA: " + (int)equipamiento.durabilidadEspada + "%", 110, 20);
 
   if (equipamiento.durabilidadEscudo > 0) fill(255); else fill(255, 50, 50);
-  text("ESCUDO: " + (int)equipamiento.durabilidadEscudo + "%", 290, 20);
+  text("ESCUDO: " + (int)equipamiento.durabilidadEscudo + "%", 210, 20);
 
   String estadoFuego = "Bloqueado";
   fill(150);
@@ -220,22 +238,70 @@ void dibujarHUD() {
       fill(255, 255, 0);
     } else {
       estadoFuego = "Carga: " + (tiempoRestante / 1000) + "s";
+      fill(200, 150, 0);
     }
   }
-  text("FUEGO: " + estadoFuego, 420, 20);
-  
+  text("FUEGO: " + estadoFuego, 320, 20);
+
   fill(255);
-  text("ZONA: " + nivelActual, 530, 20);
+  text("ZONA: " + nivelActual, 450, 20);
 
-  fill(200);
-  text("A/D: Mover | W: Saltar | J: Atacar | K: Bloquear", 780, 20);
+  fill(255);
+  text("INV:", 530, 20);
+  
+  for (int i = 0; i < 2; i++) {
+    int posX = 570 + (i * 40);
+    
+    if (i == slotSeleccionado) { stroke(255, 255, 0); strokeWeight(2); } 
+    else { stroke(100); strokeWeight(1); }
+    
+    fill(0, 0, 0, 150);
+    rect(posX, 5, 30, 30, 4);
+    noStroke();
+    
+    if (inventario[i] == 1) { 
+      fill(255, 0, 0); 
+      ellipse(posX + 15, 20, 15, 15); 
+    } else if (inventario[i] == 2) { 
+      fill(180); 
+      rect(posX + 11, 10, 8, 20); 
+    } else if (inventario[i] == 4) { 
+      fill(255, 255, 0); 
+      ellipse(posX + 15, 20, 20, 20); 
+      fill(0); 
+      textAlign(CENTER, CENTER);
+      textSize(10); 
+      text("S", posX + 15, 19); 
+      textSize(13); 
+      textAlign(LEFT, CENTER);
+    }
+  }
 
+  textAlign(RIGHT, CENTER);
   fill(255, 215, 0);
-  text("PUNTAJE: " + puntaje, 1100, 20);
+  text("PUNTAJE: " + puntaje, width - 20, 20);
+
+  textAlign(CENTER, CENTER);
+  fill(180);
+  text("A/D: Mover | W: Saltar | J: Atacar | K: Cubrir | ENTER: Usar", (660 + (width - 150)) / 2, 20);
 
   textAlign(LEFT, BASELINE);
 }
-
+void usarItem(int slot) {
+  int item = inventario[slot];
+  if (item == 1) {
+    jugador.vida = 100;
+    inventario[slot] = 0;
+  } else if (item == 2) {
+    equipamiento.durabilidadEspada = 100;
+    equipamiento.durabilidadEscudo = 100;
+    inventario[slot] = 0;
+  } else if (item == 4) {
+    jugador.invencible = true;
+    jugador.tiempoInvencibilidad = millis();
+    inventario[slot] = 0;
+  }
+}
 void dibujarGameOver() {
   background(20, 0, 0);
   textAlign(CENTER, CENTER);
@@ -248,12 +314,31 @@ void dibujarGameOver() {
   textAlign(LEFT, BASELINE);
 }
 void dibujarVictoria() {
-  background(50, 150, 50);
+  float camaraX = width / 3 - jugador.pos.x;
+  pushMatrix();
+  translate(camaraX, 0);
+  cargador.mostrar(nivelActual);
+  jugador.mostrar();
+  popMatrix();
+
+  filter(BLUR, 5);
+  fill(0, 0, 0, 170);
+  noStroke();
+  rect(0, 0, width, height);
+
   textAlign(CENTER, CENTER);
+  
   fill(255, 215, 0);
-  textSize(40);
-  text("¡VICTORIA!", width / 2, 250);
+  textSize(70);
+  text("¡VICTORIA!", width / 2, height / 2 - 60);
+
   fill(255);
-  textSize(18);
-  text("Derrotaste al jefe. Presiona ENTER para jugar de nuevo.", width/2, 340);
+  textSize(22);
+  text("Has conquistado el castillo y derrotado al jefe final.", width / 2, height / 2 + 20);
+  
+  fill(200);
+  textSize(16);
+  text("Presiona ENTER para jugar de nuevo.", width / 2, height / 2 + 70);
+  
+  textAlign(LEFT, BASELINE); 
 }

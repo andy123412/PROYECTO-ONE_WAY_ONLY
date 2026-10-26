@@ -11,8 +11,7 @@ class CargadorCSV {
     plataformas.clear();
     listaEnemigos.clear();
     plantas.clear();
-    Table tabla = loadTable(rutaCSV);
-
+    processing.data.Table tabla = loadTable(rutaCSV);
     if (tabla == null) {
       println("Error: no se encontro el archivo ");
       return;
@@ -24,7 +23,7 @@ class CargadorCSV {
     anchoTotalMapa = totalColumnas * tamanoTile;
 
     for (int fila = 0; fila < totalFilas; fila++) {
-      TableRow filaActual = tabla.getRow(fila);
+      processing.data.TableRow filaActual = tabla.getRow(fila);
 
       for (int col = 0; col < totalColumnas; col++) {
         int valor = filaActual.getInt(col);

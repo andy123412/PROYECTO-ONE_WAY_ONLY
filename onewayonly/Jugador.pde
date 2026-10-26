@@ -78,26 +78,34 @@ class Jugador {
           if (b.tipo == 8 && !b.usado) {
             b.usado = true;
             float suerte = random(100);
+            int recompensa = 0;
 
-            if (suerte < 25) {
-              vida = 100;
-              b.recompensaDada = 1;
-            } else if (suerte < 50) {
-              equipamiento.durabilidadEspada = 100;
-              equipamiento.durabilidadEscudo = 100;
-              b.recompensaDada = 2;
-            } else if (suerte < 75) {
-              equipamiento.poderFuegoActivado = true;
-              b.recompensaDada = 3;
+            if (suerte < 25) recompensa = 1;
+            else if (suerte < 50) recompensa = 2;
+            else if (suerte < 75) recompensa = 3;
+            else recompensa = 4;
+
+            b.recompensaDada = recompensa;
+
+            if (recompensa == 3) {
+              if (equipamiento.poderFuegoActivado) {
+                puntaje += 50;
+              } else {
+                equipamiento.poderFuegoActivado = true;
+              }
             } else {
-              invencible = true;
-              tiempoInvencibilidad = millis();
-              b.recompensaDada = 4;
-            }
-          }
-        }
-      }
-    }
+              if (inventario[0] == 0) inventario[0] = recompensa;
+              else if (inventario[1] == 0) inventario[1] = recompensa;
+              else {
+                if (recompensa == 1) vida = 100;
+                else if (recompensa == 2) { equipamiento.durabilidadEspada = 100; equipamiento.durabilidadEscudo = 100; }
+                else if (recompensa == 4) { invencible = true; tiempoInvencibilidad = millis(); }
+             }
+           }
+         }
+       }
+     }
+   }
 
     if (pos.y > 600) {
       vida = 0;
@@ -107,13 +115,12 @@ class Jugador {
     }
   }
 
-  void mostrar() {
-    fill(0, 102, 204);
-    stroke(0);
-    rect(pos.x, pos.y, ancho, alto);
-    if (invencible) fill(random(255), random(255), random(255));
-    else fill(0, 102, 204);
-
+void mostrar() {
+    if (invencible) {
+      fill(random(255), random(255), random(255));
+    } else {
+      fill(0, 102, 204);
+    }
     stroke(0);
     rect(pos.x, pos.y, ancho, alto);
   }
