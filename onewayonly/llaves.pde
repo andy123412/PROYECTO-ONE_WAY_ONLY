@@ -42,11 +42,22 @@ void keyReleased() {
 void mousePressed() {
   if (estadoJuego == 0) {
     int btnX = width / 2 - 180;
-    int btnY_Jugar = 280;
-
-    if (mouseX > btnX && mouseX < btnX + 360 && mouseY > btnY_Jugar && mouseY < btnY_Jugar + 55) {
+    int btnAncho = 360;
+    int btnAlto = 55;
+    
+    if (mouseX > btnX && mouseX < btnX + btnAncho && mouseY > 280 && mouseY < 280 + btnAlto) {
       iniciarJuego();
       estadoJuego = 1;
     }
+    
+    if (mouseX > btnX && mouseX < btnX + btnAncho && mouseY > 440 && mouseY < 440 + btnAlto) {
+      estadoJuego = 4;
+    }
+    
+  }  else if (estadoJuego == 4) {
+
+    if (mouseX > width / 2 - 100 && mouseX < width / 2 + 100 && mouseY > height - 100 && mouseY < height - 50) {
+      estadoJuego = 0;
+    }
   }
-}
+} 

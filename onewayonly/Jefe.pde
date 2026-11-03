@@ -56,20 +56,22 @@ class Jefe {
     }
   }
 
-  void atacarSiEstaCerca(Jugador jug, Armamento equip) {
+void atacarSiEstaCerca(Jugador jug, Armamento equip) {
     if (activo == 0) return;
-
-    float distancia = abs(jug.pos.x - x);
-    if (distancia < 50) {
+    
+    float distanciaX = abs(jug.pos.x - x);
+    float distanciaY = abs(jug.pos.y - y);
+    
+    if (distanciaX < 50 && distanciaY < 60) {
       int tiempoActual = millis();
       if (tiempoActual - tiempoUltimoGolpe >= tiempoEsperaGolpe) {
         float danoFinal = equip.mitigarDano(danoAtaque);
         if (danoFinal > 0) jug.vida -= danoFinal;
-
+        
         if (equip.bloqueando) {
           efectosParticulas.add(new SistemaParticulas(25, jug.pos.x + (jug.mirandoIzquierda ? -10 : 20), jug.pos.y + 20, color(255, 220, 50)));
         }
-
+        
         tiempoUltimoGolpe = tiempoActual;
       }
     }

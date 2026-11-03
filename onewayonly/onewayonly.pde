@@ -9,7 +9,7 @@ ArrayList<BolaFuego> bolasFuego;
 int[] inventario = {0, 0};
 int slotSeleccionado = 0;
 ArrayList<String> rankingTop10 = new ArrayList<String>();
-
+char keyIzq = 'a', keyDer = 'd', keySalto = 'w', keyAtaque = 'j', keyEscudo = 'k';
 int nivelActual = 1;
 int teclaA = 0;
 int teclaD = 0;
@@ -50,23 +50,15 @@ void draw() {
   } else if (estadoJuego == 3) {
     dibujarVictoria();
   }
+  else if (estadoJuego == 4) {
+  dibujarMenuOpciones();
+  }
 }
 
 void dibujarMenu() {
-  background(135, 206, 235);
-
-  noStroke();
-  fill(255, 220, 50);
-  ellipse(width / 2, 200, 150, 150);
-
-  fill(100, 120, 150);
-  triangle(100, 600, 450, 150, 800, 600);
-  triangle(600, 600, 950, 250, 1300, 600);
-  triangle(-100, 600, 200, 300, 500, 600);
-
-  fill(34, 139, 34);
-  ellipse(300, 650, 900, 400);
-  ellipse(1000, 600, 800, 300);
+  float camaraFalsaMenu = -millis() * 0.15; 
+  
+  dibujarEscenario(camaraFalsaMenu, 1);
 
   filter(BLUR, 6);
 
@@ -80,7 +72,7 @@ void dibujarMenu() {
 
   fill(255);
   textSize(16);
-  text("V 1.0", width / 2 + 250, 170);
+  text("V 1.6", width / 2 + 250, 170);
 
   dibujarBotonesMenu();
 }
@@ -109,36 +101,30 @@ void dibujarBotonesMenu() {
   text("Opciones de Sonido (Proximamente)", width / 2, btnY_Sonido + 25);
 
   int btnY_Teclas = 440;
-  fill(50, 50, 50, 200);
+  if (mouseX > btnX && mouseX < btnX + btnAncho && mouseY > btnY_Teclas && mouseY < btnY_Teclas + btnAlto) {
+    fill(180, 140, 20);
+  } else {
+    fill(140, 100, 15);
+  }
   rect(btnX, btnY_Teclas, btnAncho, btnAlto, 10);
-  fill(130);
-  textSize(20);
-  text("Configurar Teclas (Proximamente)", width / 2, btnY_Teclas + 25);
+  fill(255);
+  textSize(22);
+  text("TECLAS", width / 2, btnY_Teclas + 25);
 }
 
 void actualizarYDibujarJuego() {
   float tramo = cargador.anchoTotalMapa / 4.0;
 
-  if (jugador.pos.x < tramo) {
-    nivelActual = 1;
-    background(170, 215, 255);
-  } else if (jugador.pos.x >= tramo && jugador.pos.x < tramo * 2) {
-    nivelActual = 2;
-    background(100, 160, 110);
-  } else if (jugador.pos.x >= tramo * 2 && jugador.pos.x < tramo * 3) {
-    nivelActual = 3;
-    background(140, 160, 180);
-  } else {
-    nivelActual = 4;
-    background(40, 30, 50);
-  }
+  if (jugador.pos.x < tramo) nivelActual = 1;
+  else if (jugador.pos.x >= tramo && jugador.pos.x < tramo * 2) nivelActual = 2;
+  else if (jugador.pos.x >= tramo * 2 && jugador.pos.x < tramo * 3) nivelActual = 3;
+  else nivelActual = 4;
 
   if (teclaA == 1 && teclaD == 0) jugador.moverIzquierda();
   else if (teclaD == 1 && teclaA == 0) jugador.moverDerecha();
   else jugador.detener();
 
   if (teclaSalto == 1) jugador.saltar();
-
   jugador.actualizarFisicas(cargador.plataformas);
 
   for (int i = enemigos.size() - 1; i >= 0; i--) {
@@ -146,34 +132,32 @@ void actualizarYDibujarJuego() {
     e.actualizar(jugador, equipamiento, cargador.plataformas, enemigos);      
     if (e.activo == 0) enemigos.remove(i);
   }
-
+  
   equipamiento.actualizar(jugador.pos.x, jugador.pos.y, jugador.mirandoIzquierda);
 
-  if (jugador.vida <= 0) estadoJuego = 2;
-
   float camaraX = width / 3 - jugador.pos.x;
-
+  dibujarEscenario(camaraX, nivelActual);
 
   pushMatrix();
   translate(camaraX, 0);
+  
   for (int i = plantas.size() - 1; i >= 0; i--) {
     PlantaCarnivora p = plantas.get(i);
     p.actualizar(jugador);
     p.mostrar();
     if (p.activo == 0) plantas.remove(i);
   }
+  
   cargador.mostrar(nivelActual);
 
   for (int i = 0; i < enemigos.size(); i++) {
     enemigos.get(i).mostrar();
   }
+  
   jefeFinal.actualizar(jugador, cargador.plataformas);
   jefeFinal.atacarSiEstaCerca(jugador, equipamiento);
   jefeFinal.mostrar();
-  if (jefeFinal.vida <= 0) {
-    estadoJuego = 3;
-  }
-
+  
   jugador.mostrar();
   equipamiento.mostrar(jugador);
 
@@ -191,6 +175,9 @@ void actualizarYDibujarJuego() {
       efectosParticulas.remove(i);
     }
   }
+  
+  popMatrix();
+
   if (jugador.vida <= 0) {
     estadoJuego = 2;
     if (!partidaGuardada) {
@@ -206,9 +193,159 @@ void actualizarYDibujarJuego() {
       partidaGuardada = true;
     }
   }
-  popMatrix();
 
   dibujarHUD();
+}
+
+void dibujarEscenario(float camaraX, int nivel) {
+  if (nivel == 4) background(30, 20, 40); 
+  else background(95, 150, 230); 
+
+  noStroke();
+  if (nivel < 4) {
+    fill(255, 255, 255, 80); ellipse(width - 200, 150, 120, 120);
+    fill(255, 255, 220); ellipse(width - 200, 150, 80, 80);
+  } else {
+    fill(200, 200, 230, 100); ellipse(width - 200, 150, 100, 100);
+    fill(220, 220, 255); ellipse(width - 200, 150, 70, 70);
+  }
+
+  int step = 4; 
+
+  float pMontanas = floor((camaraX * 0.1) / step) * step;
+  for (float x = 0; x <= width + step; x += step) {
+    float worldX = x - pMontanas;
+    float altura = 300 + noise(worldX * 0.003) * 300; 
+    altura = floor(altura / step) * step; 
+    if (nivel == 4) fill(50, 40, 60); else fill(160, 175, 195);
+    rect(x, height - altura, step + 1, altura);
+    if (nivel < 4 && altura > 450) {
+      fill(245, 250, 255); 
+      float nieveH = floor(((altura - 420) + noise(worldX * 0.05) * 30) / step) * step;
+      rect(x, height - altura, step + 1, nieveH);
+    }
+  }
+
+  float pBosque = floor((camaraX * 0.3) / step) * step;
+  for (float x = 0; x <= width + step; x += step) {
+    float worldX = x - pBosque;
+    float altura = 250 + noise(worldX * 0.008) * 120;
+    altura = floor(altura / step) * step;
+    if (nivel == 4) fill(25, 15, 35); else fill(45, 100, 70);
+    rect(x, height - altura, step + 1, altura);
+  }
+
+  float pColinas = floor((camaraX * 0.5) / step) * step;
+  pushMatrix();
+  translate(pColinas, 0);
+  float inicio3 = floor(-pColinas / step) * step;
+  
+  for (float x = inicio3; x <= inicio3 + width + step * 2; x += step) {
+    float altura = 180 + noise(x * 0.005) * 80;
+    altura = floor(altura / step) * step;
+    if (nivel == 4) fill(15, 10, 25); else fill(80, 160, 60);
+    rect(x, height - altura, step + 1, altura);
+
+    if (x < 4000 && noise(x * 0.15) > 0.75 && !(x > 100 && x < 400)) { 
+      fill(100, 70, 40); 
+      rect(x, height - altura - 20, step + 1, 20);
+      if (x < 2000) fill(60, 150, 50); else fill(30, 90, 40); 
+      rect(x - step, height - altura - 28, (step * 3) + 1, 12);
+      rect(x, height - altura - 36, step + 1, 8);
+    }
+  }
+
+  popMatrix();
+
+  if (nivel < 4) {
+    fill(70, 170, 180, 210);
+    rect(0, height - 100, width, 100);
+    fill(255, 255, 255, 90);
+    float pAgua = floor((camaraX * 0.6 + millis() * 0.04) / step) * step; 
+    for (int i = 0; i < 20; i++) {
+      float posBaseX = noise(i * 15) * 5000;
+      float aguaX = (posBaseX + pAgua) % width;
+      if (aguaX < 0) aguaX += width; 
+      float aguaY = height - 90 + noise(i * 5) * 70;
+      float drawX = floor(aguaX / step) * step;
+      float drawY = floor(aguaY / step) * step;
+      rect(drawX, drawY, step * (4 + (int)(noise(i) * 3)) + 1, step + 1);
+    }
+  }
+}
+void dibujarMenuOpciones() {
+  float camaraFalsaMenu = -millis() * 0.15; 
+  dibujarEscenario(camaraFalsaMenu, 1);
+  filter(BLUR, 6);
+
+  fill(0, 0, 0, 180);
+  rect(0, 0, width, height);
+
+  textAlign(CENTER, CENTER);
+  fill(255, 215, 0);
+  textSize(45);
+  text("OPCIONES Y CONTROLES", width / 2, 70);
+
+  int col1 = width / 2 - 380;
+  int col2 = width / 2 - 100;
+  int col3 = width / 2 + 180;
+  
+  int fila1 = 200;
+  int fila2 = 280;
+  int fila3 = 360;
+
+  dibujarBotonTecla("Izquierda", keyIzq + "", col1, fila1);
+  dibujarBotonTecla("Derecha", keyDer + "", col2, fila1);
+  dibujarBotonTecla("Saltar", keySalto + "", col3, fila1);
+
+  dibujarBotonTecla("Atacar", keyAtaque + "", col1, fila2);
+  dibujarBotonTecla("Bloquear", keyEscudo + "", col2, fila2);
+  dibujarBotonTecla("Fuego", "L", col3, fila2);
+
+  dibujarBotonTecla("Inv Izq", "<-", col1, fila3);
+  dibujarBotonTecla("Usar Item", "ENTER", col2, fila3); 
+  dibujarBotonTecla("Inv Der", "->", col3, fila3);
+
+  int btnVolverX = width / 2 - 100;
+  int btnVolverY = height - 100;
+  
+  if (mouseX > btnVolverX && mouseX < btnVolverX + 200 && mouseY > btnVolverY && mouseY < btnVolverY + 50) {
+    fill(200, 50, 50);
+  } else {
+    fill(160, 40, 40);
+  }
+  
+  rect(btnVolverX, btnVolverY, 200, 50, 10);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(20);
+  text("VOLVER", width / 2, btnVolverY + 22);
+}
+
+void dibujarBotonTecla(String accion, String tecla, int x, int y) {
+  textAlign(LEFT, CENTER);
+  fill(255);
+  textSize(18);
+  text(accion, x, y);
+
+  int boxX = x + 110; 
+  int boxWidth = max(50, (int)textWidth(tecla) + 20);
+
+  fill(180, 140, 20); 
+  stroke(255, 215, 0); 
+  strokeWeight(2);
+  rect(boxX, y - 20, boxWidth, 40, 5);
+
+  fill(20);
+  noStroke();
+  rect(boxX + 5, y - 12, boxWidth - 10, 28, 3);
+  fill(40);
+  rect(boxX + 5, y - 12, boxWidth - 10, 15, 3); 
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(tecla.toUpperCase(), boxX + boxWidth / 2, y + 2);
 }
 
 void dibujarHUD() {
