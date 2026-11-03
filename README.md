@@ -1,7 +1,7 @@
 # PROYECTO-ONE_WAY_ONLY
 Bitácora de Desarrollo: Proyecto "ONE WAY ONLY"
 Alumno: Andy Sandoval Ruiz
-Período: Agosto 2026 – Octubre 2026
+Período: Agosto 2026 – Noviembre 2026
 Entorno / Lenguaje: Processing 4.5.5 (Java), MySQL (DBeaver)
 
 Semana 1 (Principios de Agosto)
@@ -85,10 +85,36 @@ Desarrollo de ConexionBD.pde aplicando consultas seguras (PreparedStatement) par
 
 Se resolvieron errores de compilación por colisión de nombres (Ambigüedad) forzando el tipado absoluto estricto: processing.data.Table para los mapas CSV y java.sql.Statement para las consultas a la base de datos.
 
-Semana 10 (Cierre del Proyecto)
-Objetivo: Sistema de inventario, refinamiento visual y entrega final.
+Semana 10 
+Objetivo: Sistema de inventario, refinamiento visual.
 
 Desarrollo de un inventario dinámico de 2 slots en el HUD, navegable con las flechas (Izquierda/Derecha) y operable con la tecla ENTER.
+
+Semana 11 (Finales de Octubre - Principios de Noviembre)
+Objetivo: Profundidad visual procedimental y entorno dinámico (Estilo Voxel/Terraria).
+
+Se descartó el uso de fondos de colores planos o imágenes estáticas para desarrollar un motor de renderizado de Parallax Scrolling de 4 capas independientes (Montañas nevadas, Bosque oscuro, Colinas y Río).
+
+Implementación de Ruido Perlin (noise()) para la generación matemática y orgánica del terreno, logrando picos, valles y colocación aleatoria de árboles sin patrones repetitivos.
+
+Se desarrolló un algoritmo de "Snapping" basado en funciones de redondeo (floor(camaraX / step) * step) para forzar que el escenario mantenga una forma estrictamente cuadrada (estilo pixel-art) independientemente de los movimientos decimales del jugador.
+
+Resolución de errores de Tearing (desgarro de pantalla o parpadeo de líneas blancas entre columnas) sumando un píxel extra de solapamiento en el renderizado (step + 1).
+
+Se aplicó física independiente al cuerpo de agua frontal, utilizando millis() para que la corriente fluya de manera constante hacia la derecha, independientemente de la posición de la cámara.
+
+Semana 12 
+Objetivo: Interfaz de Opciones (UI), navegación de menús y versión candidata (V 1.6).
+
+Integración del sistema de Parallax en la pantalla de título principal, utilizando una cámara autónoma negativa para crear un fondo cinemático en movimiento continuo con un filtro de desenfoque (filter(BLUR)).
+
+Desarrollo del sub-menú "Opciones y Controles" estructurado en una cuadrícula simétrica de 3x3 (Grid) para mostrar de forma limpia los mapeos de teclado (Movimiento, Combate e Inventario).
+
+Creación de un renderizador dinámico de interfaz gráfica para los botones de las teclas que calcula automáticamente su tamaño en base a la longitud de la cadena de texto (textWidth()), permitiendo acomodar palabras completas como "ENTER".
+
+Refactorización y ajuste matemático de los eventos de ratón (mousePressed()) para asegurar que las cajas de colisión (Hitboxes) coincidan perfectamente con el diseño visual del menú principal y el botón "Volver".
+
+Cierre de la compilación de la versión V 1.6 del proyecto.
 
 Programación del estado de victoria cinemático aplicando filtros nativos (filter(BLUR)) sobre el último fotograma del castillo para resaltar el texto de conclusión.
 
