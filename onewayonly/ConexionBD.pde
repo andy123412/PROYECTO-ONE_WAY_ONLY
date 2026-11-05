@@ -20,7 +20,6 @@ class ConexionBD {
     }
   }
 
-  // Método para guardar cuando perdés o ganás
   void guardarPartida(int zona, int puntajeFinal, float vidaFinal, float espada, float escudo, boolean derrotoJefe) {
     if (conexion != null) {
       try {
