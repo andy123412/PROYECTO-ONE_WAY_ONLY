@@ -119,3 +119,17 @@ Cierre de la compilación de la versión V 1.6 del proyecto.
 Programación del estado de victoria cinemático aplicando filtros nativos (filter(BLUR)) sobre el último fotograma del castillo para resaltar el texto de conclusión.
 
 Depuración final del código, empaquetado del archivo ejecutable .exe y redacción de la documentación para la defensa técnica oral.
+
+Semana 13 (Mediados de Noviembre)Objetivo: Sistema de audio profesional, UI de Pausa y persistencia en tiempo real.
+
+Integración de la librería ddf.minim para la gestión de audio. Se desarrolló la clase GestorAudio.pde centralizando la música ambiental y los efectos de sonido (SFX).
+
+Se migraron los archivos de sonido de formato .mp3 a .wav para eliminar por completo la latencia en las colisiones, el error "Metralleta" de superposición de canales (Stacking) y las excepciones nativas por metadatos (ID3 TXXX).
+
+Se diseñó una interfaz gráfica in-game para el Menú de Pausa (Estado 5), capturando un frame activo del juego mediante la función get() y aplicando un filtro gaussiano (filter(BLUR)) para generar un fondo borroso cinemático.
+
+Implementación de un Slider lineal (barra de volumen) deslizable con el mouse en el menú de opciones. Se aplicó mapeo matemático (map()) para convertir la posición horizontal (X) del ratón en valores decibélicos precisos (-40dB a 0dB) para el motor de Minim.
+
+Desarrollo de un sistema de guardado local mediante "Casilleros" (Slots). Se programaron arrays temporales para guardar instantáneamente la posición en el eje X, nivel actual, estadísticas de vida y durabilidad de armas cuando el usuario retorna al menú principal.
+
+Resolución de un bug de "Música Fantasma" y speedrun donde los soundtracks del nivel y del jefe se solapaban al reiniciar casilleros. Se solucionó programando un método de vaciado de buffers (rewind() y pause()) previo a la llamada de cada pista nueva.
